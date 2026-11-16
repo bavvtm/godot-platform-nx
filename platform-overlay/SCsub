@@ -1,0 +1,104 @@
+#!/usr/bin/env python
+from misc.utility.scons_hints import *
+
+Import("env")
+
+import os
+import subprocess
+import version
+
+from methods import print_error
+
+File = env.File
+
+common_switch = [
+  "godot_switch.cpp",
+  "os_switch.cpp",
+  "switch_wrap.cpp",
+  "libc_stubs.cpp",
+  "display_server_switch.cpp",
+  "audio_driver_switch.cpp",
+  "joypad_switch.cpp",
+]
+  
+def generate_nro(target, source, env):
+  elf_file = str(target[0])
+  nro_file = elf_file + ".nro"
+  
+  dkp = os.environ.get("DEVKITPRO", "/opt/devkitpro")
+  nacptool_path = f"{dkp}/tools/bin/nacptool"
+  if not os.path.exists(nacptool_path):
+    nacptool_path = f"{dkp}/devkitA64/bin/nacptool"
+    
+  nacp_file = File("#bin/godot.nacp").abspath
+  version_str = f"{version.major}.{version.minor}.{version.patch}-{version.status}"[:15]
+  nacp_res = subprocess.run(
+    [nacptool_path, "--create", "Godot Engine", "bavvtm", version_str, nacp_file],
+    capture_output=True,
+    text=True
+  )
+  if nacp_res.returncode != 0:
+    print_error(f"Failed to generate NACP:\n{nacp_res.stderr}")
+    return 1
+  
+  elf2nro_path = f"{dkp}/tools/bin/elf2nro"
+  if not os.path.exists(elf2nro_path):
+    elf2nro_path = f"{dkp}/devkitA64/bin/elf2nro"
+
+  romfs_dir = Dir("#platform/switch/romfs").abspath
+  icon_file = File("#platform/switch/icon.jpg").abspath
+  result = subprocess.run(
+    [elf2nro_path, elf_file, nro_file, f"--icon={icon_file}", f"--nacp={nacp_file}", f"--romfsdir={romfs_dir}"],
+    capture_output=True,
+    text=True
+  )
+  if result.returncode != 0:
+    print_error(f"Failed to generate NRO:\n{result.stderr}")
+    return 1
+  return 0
+
+def process_splash_png(target, source, env):
+  try:
+    from PIL import Image
+    import zlib
+
+    png_path = str(source[0])
+    out_path = str(target[0])
+
+    img = Image.open(png_path).convert("RGBA")
+    raw_rgba = img.tobytes()
+    compressed_rgba = zlib.compress(raw_rgba, 9)
+    with open(out_path, "wb") as f:
+      f.write(compressed_rgba)
+    return 0
+  except ImportError:
+    print_error("Python 'Pillow' library is required! Run: pip install Pillow")
+    return 1
+  except Exception as e:
+    print_error(f"Failed to process PNG: {e}")
+    return 1
+  
+splash_bin = "romfs/applet_splash.rgba.z"
+if not os.path.exists(splash_bin):
+  env.Command("applet_splash.png", splash_png, env.Action(process_splash_png, "Converting $SOURCE to compressed RGBA"))
+
+if env["vulkan"]:
+  common_switch.append("rendering_context_driver_vulkan_switch.cpp")
+
+if env["opengl3"]:
+  common_switch.append("gl_manager_switch.cpp")
+  # glad
+  env_glad = env.Clone()
+  env_glad.Prepend(CPPPATH=["#thirdparty/glad"])
+  common_switch.append(env_glad.Object("#thirdparty/glad/gl.c"))
+  
+switch_objs = []
+for src in common_switch:
+  if isinstance(src, str):
+    switch_objs.append(env.Object(src))
+  else:
+    switch_objs.append(src)
+
+prog = env.add_program("#bin/godot", switch_objs)
+env.Depends(prog, splash_bin)
+env.AddPostAction(prog, env.Action(generate_nro, "Generating NRO"))
