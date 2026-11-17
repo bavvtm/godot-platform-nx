@@ -33,7 +33,7 @@ def generate_nro(target, source, env):
   nacp_file = File("#bin/godot.nacp").abspath
   version_str = f"{version.major}.{version.minor}.{version.patch}-{version.status}"[:15]
   nacp_res = subprocess.run(
-    [nacptool_path, "--create", "Godot Engine", "bavvtm", version_str, nacp_file],
+    [nacptool_path, "--create", "Godot Engine", "godotengine.org", version_str, nacp_file],
     capture_output=True,
     text=True
   )
@@ -80,7 +80,7 @@ def process_splash_png(target, source, env):
   
 splash_bin = "romfs/applet_splash.rgba.z"
 if not os.path.exists(splash_bin):
-  env.Command("applet_splash.png", splash_png, env.Action(process_splash_png, "Converting $SOURCE to compressed RGBA"))
+  env.Command(splash_bin, "applet_splash.png", env.Action(process_splash_png, "Converting $SOURCE to compressed RGBA"))
 
 if env["vulkan"]:
   common_switch.append("rendering_context_driver_vulkan_switch.cpp")
