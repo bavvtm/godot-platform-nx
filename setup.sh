@@ -15,10 +15,10 @@ $SUDO apt-get update
 $SUDO apt-get update
 $SUDO apt-get install -y --no-install-recommends \
   build-essential cmake ninja-build pkg-config \
-  flex bison curl git ca-certificates \
+  flex bison curl zip git ca-certificates \
   python3 python3-pip python3-pil python3-setuptools python3-wheel \
   clang libclang-dev llvm-dev \
-  spirv-tools spirv-headers
+  spirv-tools spirv-headers mingw-w64
 
 LLVM_VER="$(llvm-config --version | cut -d. -f1)"
 $SUDO apt-get install -y --no-install-recommends \

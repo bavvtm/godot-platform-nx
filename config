@@ -14,9 +14,16 @@ GODOT_REF="4.7.2-stable"
 # Godot target build (default: template_debug)
 GODOT_TARGET="template_release"
 
+# Godot cpp source
+GODOT_CPP_REPO="https://github.com/godotengine/godot-cpp.git"
+GODOT_CPP_REF="10.0.0-stable"
+
+# Godot cpp target build (default: template_debug)
+GODOT_CPP_TARGET="template_release"
+
 # Mesa Source
 MESA_REPO="https://github.com/danfromtico/mesa-switch.git"
 MESA_REF="0ff52079ca9e9e837ed27eb95a8d239f439a1864"
 
 # Mesa build type (default: debug)
-MESA_BUILD_TYPE=release
+MESA_BUILD_TYPE="release"

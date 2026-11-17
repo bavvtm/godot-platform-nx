@@ -11,6 +11,10 @@ GODOT_TARGET="${GODOT_TARGET:-template_debug}"
 MESA_OVERLAY_DIR="${MESA_OVERLAY_DIR:-${ROOT_DIR}/mesa}"
 MESA_SOURCE="${MESA_SOURCE:-${BUILD_DIR}/mesa}"
 MESA_BUILD_TYPE="${MESA_BUILD_TYPE:-debug}"
+EXPORTER_SRC_DIR="${EXPORTER_SRC_DIR:-${ROOT_DIR}/exporter}"
+GODOT_CPP_SOURCE="${GODOT_CPP_SOURCE:-${BUILD_DIR}/godot-cpp}"
+GODOT_CPP_TARGET="${GODOT_CPP_TARGET:-template_debug}"
+ADDON_OUT_DIR="${ADDON_OUT_DIR:-${ROOT_DIR}/addons/switch_exporter}"
 JOBS=${JOBS:-$(nproc)}
 
 function clone_mesa() {
@@ -82,7 +86,70 @@ function build_godot() {
     "${BUILD_DIR}/${GODOT_TARGET}"
 
   cp -f "${GODOT_SOURCE}/bin/godot.switch.${GODOT_TARGET}.arm64.nro" \
-    "${BUILD_DIR}/${GODOT_TARGET}.nro"
+    "${BUILD_DIR}/Godot_${GODOT_REF}_switch.nro"
+
+  return 0
+}
+
+function clone_godot_cpp() {
+  if [[ ! -d "${GODOT_CPP_SOURCE}/.git" ]]; then
+    git clone --depth 1 --branch "${GODOT_CPP_REF}" \
+      "${GODOT_CPP_REPO}" \
+      "${GODOT_CPP_SOURCE}" || return 1
+  fi
+
+  return 0
+}
+
+function build_exporter() {
+  mkdir -p "${ADDON_OUT_DIR}"
+
+  python3 -m SCons -C "${EXPORTER_SRC_DIR}" \
+    platform=linux \
+    target="${GODOT_CPP_TARGET}" \
+    godot_cpp_dir="${GODOT_CPP_SOURCE}" \
+    addon_dir="${ADDON_OUT_DIR}" \
+    -j"${JOBS}" || return 1
+
+  if command -v x86_64-w64-mingw32-g++ >/dev/null 2>&1; then
+    python3 -m SCons -C "${EXPORTER_SRC_DIR}" \
+      platform=windows \
+      target="${GODOT_CPP_TARGET}" \
+      use_mingw=yes \
+      use_static_cpp=yes \
+      godot_cpp_dir="${GODOT_CPP_SOURCE}" \
+      addon_dir="${ADDON_OUT_DIR}" \
+      -j"${JOBS}" || return 1
+  else
+    echo "Info: mingw-w64 not found, skipping Windows .dll build."
+  fi
+
+  return 0
+}
+
+function make_zip() {
+  local zip_file_name="switch_exporter-godot_${GODOT_REF}.zip"
+  local zip_output="${BUILD_DIR}/${zip_file_name}"
+
+  rm -f "${ADDON_OUT_DIR}/.gdignore"
+
+  cp -f "${GODOT_OVERLAY_DIR}/romfs/applet_splash.rgba.z" \
+    "${ADDON_OUT_DIR}/romfs/applet_splash.rgba.z"
+
+  cp -f "${BUILD_DIR}/${GODOT_TARGET}" \
+    "${ADDON_OUT_DIR}/${GODOT_TARGET}"
+
+  if [ ! -f "${ADDON_OUT_DIR}/libswitch_exporter.linux.template_release.x86_64.so" ] && \
+     [ ! -f "${ADDON_OUT_DIR}/libswitch_exporter.windows.template_release.x86_64.dll" ]; then
+    echo "Error: Exporter shared libraries (.so / .dll) not found in ${ADDON_OUT_DIR}!"
+    return 1
+  fi
+
+  (
+    cd "${ROOT_DIR}" && \
+    zip -r -q "${zip_output}" "addons/switch_exporter" \
+      -x "*.gitkeep" "*.tmp*" "*/.gdignore"
+  )
 
   return 0
 }
@@ -98,10 +165,17 @@ case "${1:-all}" in
     clone_godot || exit 1
     build_godot || exit 1
     ;;
+  exporter)
+    clone_godot_cpp || exit 1
+    build_exporter || exit 1
+    ;;
   all|*)
     clone_mesa || exit 1
     clone_godot || exit 1
+    clone_godot_cpp || exit 1
     build_mesa || exit 1
     build_godot || exit 1
+    build_exporter || exit 1
+    make_zip || exit 1
     ;;
 esac

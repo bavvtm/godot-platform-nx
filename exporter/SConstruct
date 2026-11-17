@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+import os
+import sys
+
+libname = "switch_exporter"
+godot_cpp_dir = os.path.relpath(ARGUMENTS.get("godot_cpp_dir", "../build/godot-cpp"))
+addon_dir = os.path.relpath(ARGUMENTS.get("addon_dir", "../addons/switch_exporter"))
+
+localEnv = Environment(tools=["default"], PLATFORM="")
+localEnv["build_profile"] = "build_profile.json"
+
+customs = [os.path.abspath(path) for path in ["custom.py"] if os.path.exists(path)]
+opts = Variables(customs, ARGUMENTS)
+opts.Update(localEnv)
+
+Help(opts.GenerateHelpText(localEnv))
+
+env = localEnv.Clone()
+
+if not (os.path.isdir(godot_cpp_dir) and os.listdir(godot_cpp_dir)):
+  print(f"Error: godot-cpp not found in '{godot_cpp_dir}'. please run clone first")
+  sys.exit(1)
+
+sconscript_exports = {"env": env, "customs": customs}
+if "custom_api_file" not in ARGUMENTS:
+  sconscript_exports["api_version"] = "4.7"  # use 4.7.x as default
+
+env = SConscript(os.path.join(godot_cpp_dir, "SConstruct"), exports=sconscript_exports)
+
+env.Append(CPPPATH=["src/"])
+sources = Glob("src/*.cpp")
+
+def generate_logo_header(target, source, env):
+  try:
+    from PIL import Image
+
+    png_path = str(source[0])
+    out_path = str(target[0])
+
+    img = Image.open(png_path).convert("RGBA").resize((32, 32), Image.Resampling.LANCZOS)
+    raw = img.tobytes()
+
+    with open(out_path, "w") as f:
+      f.write("#pragma once\n#include <cstdint>\n\n")
+      f.write("static constexpr int SWITCH_LOGO_SIZE = 32;\n")
+      f.write("static const uint8_t switch_logo_rgba[] = {\n\t")
+      f.write(", ".join(f"0x{b:02x}" for b in raw))
+      f.write("\n};\n")
+    return 0
+  except ImportError:
+    print("Python 'Pillow' library is required! Run: pip install Pillow")
+    return 1
+  except Exception as e:
+    print(f"Failed to embed logo.png: {e}")
+    return 1
+
+logo_gen = None
+if os.path.exists("src/logo.png"):
+  logo_gen = env.Command(
+    "src/logo_data.gen.h",
+    "src/logo.png",
+    env.Action(generate_logo_header, "Embedding $SOURCE into $TARGET"),
+  )
+  Depends(sources, logo_gen)
+
+# .dev doesn't inhibit compatibility, so we don't need to key it.
+# .universal just means "compatible with all relevant arches" so we don't need to key it.
+suffix = env["suffix"].replace(".dev", "").replace(".universal", "")
+
+lib_filename = "{}{}{}{}".format(
+  env.subst("$SHLIBPREFIX"),
+  libname,
+  suffix,
+  env.subst("$SHLIBSUFFIX"),
+)
+
+build_out_dir = os.path.abspath(os.path.join("..", "build", "exporter-bin", env["platform"]))
+library = env.SharedLibrary(
+  os.path.join(build_out_dir, lib_filename),
+  source=sources,
+)
+
+if logo_gen is not None:
+  Depends(library, logo_gen)
+
+# auto install to addons folder
+install_target = env.Install(addon_dir, library)
+Default([library, install_target])

@@ -1,0 +1,27 @@
+{
+	"enabled_classes": [
+		"Object",
+		"RefCounted",
+		"Resource",
+		"OS",
+		"Time",
+		"ProjectSettings",
+		"DirAccess",
+		"FileAccess",
+		"Mutex",
+		"Thread",
+		"PacketPeer",
+		"PacketPeerUDP",
+		"PCKPacker",
+
+		"Texture",
+		"Texture2D",
+		"Image",
+		"ImageTexture",
+
+		"EditorPlugin",
+		"EditorExportPlatform",
+		"EditorExportPlatformExtension",
+		"EditorExportPreset"
+	]
+}
