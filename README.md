@@ -1,6 +1,6 @@
-# Godot 4 for Nintendo Switch (overlay)
+# Godot 4 for Nintendo Switch
 
-This repository contains a *Godot 4* platform overlay targeting the Nintendo Switch architecture via [devkitPro](https://devkitpro.org/) and [mesa-switch](https://github.com/danfromtico/mesa-switch.git). See the original [Godot Engine docs](https://docs.godotengine.org/en/stable/) for info about Godot.
+This repository contains a *Godot 4* platform targeting the Nintendo Switch architecture via [devkitPro](https://devkitpro.org/) and [mesa-switch](https://github.com/danfromtico/mesa-switch.git). See the original [Godot Engine docs](https://docs.godotengine.org/en/stable/) for info about Godot.
 
 > [!NOTE]
 > **EXPERIMENTAL BUILD**
@@ -23,9 +23,15 @@ Only core features are implemented and tested so far:
 
 - **Slow First Boot (~20s black screen):** The first launch takes around 20 seconds on a black screen while shaders compile and assets load from the microSD card.
 - **No GDExtension Support:** Dynamic libraries (`dlopen`) are stubbed out on Switch, so only pure GDScript projects are supported for now.
-- **No C# / .NET:** Built without Mono/C# support — GDScript only.
+- **No C# / .NET:** Built without Mono/C# support—GDScript only.
 - **Full RAM Mode Required:** Launching from the Album menu (Applet Mode) is blocked due to low memory.
-- **Manual Export:** No one-click editor exporter addon yet—you need to bundle your `.pck` with the `.nro` template manually.
+
+## Quick Usage
+
+- **Godot Version:** Requires **Godot 4.7.2-stable** (standard build)—macos is not supported.
+- **Install:** Extract `switch_exporter-*.zip` in your project root and reload the project.
+- **Export:** Go to **Project > Export > Add... > Nintendo Switch** and export your `.nro` (generates `.nro` + `.pck`).
+- **Run on Switch:** Copy both `.nro` and `.pck` to the same folder on your SD card (e.g. `sdmc:/switch/your_game/`).
 
 ## Credits & Acknowledgements
 
