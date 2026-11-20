@@ -67,6 +67,12 @@ void DisplayServerSwitch::_dispatch_input_events(const Ref<InputEvent> &p_event)
 }
 
 void DisplayServerSwitch::dispatch_window_event(DisplayServerEnums::WindowEvent p_event) {
+	if (p_event == DisplayServerEnums::WINDOW_EVENT_FOCUS_IN) {
+		main_window.is_focused = true;
+	} else if (p_event == DisplayServerEnums::WINDOW_EVENT_FOCUS_OUT) {
+		main_window.is_focused = false;
+	}
+	
 	if (main_window.window_event_callback.is_valid()) {
 		Variant ev = p_event;
 		main_window.window_event_callback.call(ev);
