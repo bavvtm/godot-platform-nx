@@ -40,6 +40,8 @@ bool is_lite_model();
 void ensure_dir(const char *p_path);
 void init_file_logging_from_argv(const char *p_argv0);
 
+int load_args_from_file(const char *p_argv0, char ***r_out_argv);
+
 inline uint64_t millis() {
 	return armTicksToNs(armGetSystemTick()) / 1000000ULL;
 }

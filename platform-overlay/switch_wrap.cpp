@@ -38,23 +38,32 @@ void ensure_dir(const char *p_path) {
 	mkdir(tmp, 0777);
 }
 
-void init_file_logging_from_argv(const char *p_argv0) {
-	char app_dir[512] = "sdmc:/switch";
+void get_app_dir_from_argv(const char *p_argv0, char *r_dir, size_t p_len) {
+	if (!r_dir || p_len == 0) {
+		return;
+	}
+
+	snprintf(r_dir, p_len, "sdmc:/switch");
 
 	if (p_argv0 && p_argv0[0] != '\0') {
 		if (strncmp(p_argv0, "sdmc:/", 6) == 0) {
-			snprintf(app_dir, sizeof(app_dir), "%s", p_argv0);
+			snprintf(r_dir, p_len, "%s", p_argv0);
 		} else if (p_argv0[0] == '/') {
-			snprintf(app_dir, sizeof(app_dir), "sdmc:%s", p_argv0);
+			snprintf(r_dir, p_len, "sdmc:%s", p_argv0);
 		} else {
-			snprintf(app_dir, sizeof(app_dir), "sdmc:/switch/%s", p_argv0);
+			snprintf(r_dir, p_len, "sdmc:/switch/%s", p_argv0);
 		}
 
-		char *last_slash = strrchr(app_dir, '/');
-		if (last_slash && last_slash > app_dir + 5) {
+		char *last_slash = strrchr(r_dir, '/');
+		if (last_slash && last_slash > r_dir + 5) {
 			*last_slash = '\0';
 		}
 	}
+}
+
+void init_file_logging_from_argv(const char *p_argv0) {
+	char app_dir[512];
+	get_app_dir_from_argv(p_argv0, app_dir, sizeof(app_dir));
 
 	ensure_dir("sdmc:/switch");
 	ensure_dir(app_dir);
@@ -71,6 +80,51 @@ void init_file_logging_from_argv(const char *p_argv0) {
 			setvbuf(stderr, nullptr, _IONBF, 0);
 		}
 	}
+}
+
+static void _parse_args_file(const char *p_file_path, char ***r_list, int *r_count) {
+	FILE *f = fopen(p_file_path, "r");
+	if (!f) {
+		return;
+	}
+
+	char tok[256];
+	while (fscanf(f, "%255s", tok) == 1) {
+		// skip comment
+		if (tok[0] == '#') {
+			int c;
+			while ((c = fgetc(f)) != '\n' && c != EOF) {}
+			continue;
+		}
+
+		*r_list = (char **)realloc(*r_list, sizeof(char *) * (*r_count + 1));
+		(*r_list)[(*r_count)++] = strdup(tok);
+	}
+
+	fclose(f);
+}
+
+int load_args_from_file(const char *p_argv0, char ***r_out_argv) {
+	if (!r_out_argv) {
+		return 0;
+	}
+
+	char **list = nullptr;
+	int count = 0;
+
+	char app_dir[512];
+	get_app_dir_from_argv(p_argv0, app_dir, sizeof(app_dir));
+
+	char args_path[544];
+	snprintf(args_path, sizeof(args_path), "%s/args.txt", app_dir);
+
+	_parse_args_file(args_path, &list, &count);
+	if (count == 0) {
+		_parse_args_file("romfs:/args.txt", &list, &count);
+	}
+
+	*r_out_argv = list;
+	return count;
 }
 
 u32 hardware_type() {
