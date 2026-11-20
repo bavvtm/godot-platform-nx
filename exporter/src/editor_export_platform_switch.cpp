@@ -146,6 +146,12 @@ TypedArray<Dictionary> EditorExportPlatformSwitch::_get_export_options() const {
 	opt_template["default_value"] = DEFAULT_TEMPLATE_PATH;
 	options.push_back(opt_template);
 
+	Dictionary opt_fused;
+	opt_fused["name"] = "binary_format/fused_build";
+	opt_fused["type"] = Variant::BOOL;
+	opt_fused["default_value"] = false;
+	options.push_back(opt_fused);
+
 	Dictionary opt_title;
 	opt_title["name"] = "application/title";
 	opt_title["type"] = Variant::STRING;
@@ -254,6 +260,30 @@ Error EditorExportPlatformSwitch::_export_project(const Ref<EditorExportPreset> 
 	config.icon_source_path = p_preset->get("application/icon");
 	config.romfs_source_dir = ps->globalize_path(ROMFS_PATH);
 	config.template_elf_path = ps->globalize_path(p_preset->get("custom_template/release"));
+
+	bool is_fused = p_preset->get("binary_format/fused_build");
+	if (is_fused) {
+		String tmp_pck_abs = ps->globalize_path("res://.godot/switch_export_tmp/game.pck");
+		DirAccess::make_dir_recursive_absolute(tmp_pck_abs.get_base_dir());
+
+		Error pack_err = _build_pck(p_preset, p_debug, tmp_pck_abs);
+		if (pack_err != OK) {
+			UtilityFunctions::push_error("failed to pack fused PCK file at ", tmp_pck_abs);
+			return pack_err;
+		}
+
+		config.fused_pck_path = tmp_pck_abs;
+		nro_builder.set_output_path(out_nro_abs);
+		Error nro_err = nro_builder.build(config);
+		DirAccess::remove_absolute(tmp_pck_abs);
+
+		if (nro_err != OK) {
+			return nro_err;
+		}
+
+		UtilityFunctions::print("successfully exported fused NRO: ", out_nro_abs);
+		return OK;
+	}
 
 	nro_builder.set_output_path(out_nro_abs);
 	Error nro_err = nro_builder.build(config);

@@ -42,13 +42,23 @@ Error NroBuilder::_convert_icon_to_jpeg(const String &p_src_icon_path, const Str
 	return bg_img->save_jpg(p_out_jpg_path, 0.92f);
 }
 
-Error NroBuilder::_prepare_staging_romfs(const String &p_src_romfs_dir, const String &p_staging_romfs_dir) {
+Error NroBuilder::_prepare_staging_romfs(const String &p_src_romfs_dir, const String &p_staging_romfs_dir, const String &p_fused_pck_path) {
 	DirAccess::make_dir_recursive_absolute(p_staging_romfs_dir);
-	DirAccess::remove_absolute(p_staging_romfs_dir.path_join("game.pck"));
+	
+	String target_pck = p_staging_romfs_dir.path_join("game.pck");
+	DirAccess::remove_absolute(target_pck);
 
 	String splash_src = p_src_romfs_dir.path_join("applet_splash.rgba.z");
 	if (FileAccess::file_exists(splash_src)) {
 		DirAccess::copy_absolute(splash_src, p_staging_romfs_dir.path_join("applet_splash.rgba.z"));
+	}
+
+	if (!p_fused_pck_path.is_empty()) {
+		Error copy_err = DirAccess::copy_absolute(p_fused_pck_path, target_pck);
+		if (copy_err != OK) {
+			UtilityFunctions::push_error("failed to copy fused PCK to staging romfs: ", p_fused_pck_path);
+			return copy_err;
+		}
 	}
 
 	return OK;
@@ -113,7 +123,11 @@ Error NroBuilder::build(const NroBuildConfig &p_config) {
 	String icon_jpg = tmp_dir.path_join("icon_converted.jpg");
 
 	String src_romfs = p_config.romfs_source_dir.is_empty() ? ps->globalize_path(ROMFS_PATH) : p_config.romfs_source_dir;
-	_prepare_staging_romfs(src_romfs, romfs_dir);
+
+	Error staging_err = _prepare_staging_romfs(src_romfs, romfs_dir, p_config.fused_pck_path);
+	if (staging_err != OK) {
+		return staging_err;
+	}
 
 	Error nacp_err = _generate_nacp(nacptool, p_config, nacp_path);
 	if (nacp_err != OK) {

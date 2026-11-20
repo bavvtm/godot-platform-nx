@@ -12,6 +12,7 @@ struct NroBuildConfig {
 	String icon_source_path;
   String romfs_source_dir;
   String template_elf_path;
+  String fused_pck_path;
 };
 
 class NroBuilder {
@@ -19,7 +20,7 @@ private:
   String output_path;
 
   Error _convert_icon_to_jpeg(const String &p_src_icon_path, const String &p_out_jpg_path);
-	Error _prepare_staging_romfs(const String &p_src_romfs_dir, const String &p_staging_romfs_dir);
+  Error _prepare_staging_romfs(const String &p_src_romfs_dir, const String &p_staging_romfs_dir, const String &p_fused_pck_path);
 	Error _generate_nacp(const String &p_nacptool_bin, const NroBuildConfig &p_config, const String &p_out_nacp_path);
 	Error _generate_nro(const String &p_elf2nro_bin, const NroBuildConfig &p_config, const String &p_nacp_path, const String &p_romfs_dir, const String &p_icon_jpg_path);
 
