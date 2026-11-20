@@ -12,10 +12,24 @@ namespace nx {
 FILE *s_log_file = nullptr;
 
 static int _log_write_cb(void *, const char *p_buf, size_t p_len) {
+	static bool line_start = true;
+	static uint64_t t0 = nx::millis();
+
 	if (s_log_file && p_len > 0) {
-		fwrite(p_buf, 1, p_len, s_log_file);
+		for (size_t i = 0; i < p_len; i++) {
+			if (line_start) {
+				uint64_t ms = nx::millis() - t0;
+				fprintf(s_log_file, "[%4llu.%03llu] ", (unsigned long long)(ms / 1000), (unsigned long long)(ms % 1000));
+				line_start = false;
+			}
+			fputc(p_buf[i], s_log_file);
+			if (p_buf[i] == '\n') {
+				line_start = true;
+			}
+		}
 		fflush(s_log_file);
 	}
+	
 	return (int)p_len;
 }
 
