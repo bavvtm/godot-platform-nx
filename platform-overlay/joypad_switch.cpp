@@ -102,6 +102,43 @@ void JoypadSwitch::process_pad() {
 	}
 }
 
+void JoypadSwitch::reset_pad_state() {
+	if (!input) {
+		return;
+	}
+
+	for (int index = 0; index < JOYPADS_MAX; index++) {
+		if (!connected[index]) {
+			prev_buttons[index] = 0;
+			continue;
+		}
+
+		if (prev_buttons[index] != 0) {
+			for (const KeyValue<HidNpadButton, JoyButton> &E : button_map) {
+				if (prev_buttons[index] & E.key) {
+					input->joy_button(index, E.value, false);
+				}
+			}
+
+			// zl zr
+			if (prev_buttons[index] & HidNpadButton_ZL) {
+				input->joy_axis(index, JoyAxis::TRIGGER_LEFT, 0.0f);
+			}
+			if (prev_buttons[index] & HidNpadButton_ZR) {
+				input->joy_axis(index, JoyAxis::TRIGGER_RIGHT, 0.0f);
+			}
+
+			// centered analog
+			input->joy_axis(index, JoyAxis::LEFT_X, 0.0f);
+			input->joy_axis(index, JoyAxis::LEFT_Y, 0.0f);
+			input->joy_axis(index, JoyAxis::RIGHT_X, 0.0f);
+			input->joy_axis(index, JoyAxis::RIGHT_Y, 0.0f);
+
+			prev_buttons[index] = 0;
+		}
+	}
+}
+
 JoypadSwitch::JoypadSwitch() {
   // Does nothing.
 }

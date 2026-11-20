@@ -165,8 +165,12 @@ void OS_Switch::run() {
 			}
 		}
 
-		if (in_focus && joypad_switch) {
-			joypad_switch->process_pad();
+		if (joypad_switch) {
+			if (in_focus) {
+				joypad_switch->process_pad();
+			} else {
+				joypad_switch->reset_pad_state();
+			}
 		}
 
 		DisplayServer::get_singleton()->process_events();

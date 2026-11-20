@@ -23,6 +23,7 @@ private:
 public:
   Error initialize();
 	void process_pad();
+	void reset_pad_state();
 
 	JoypadSwitch();
 	~JoypadSwitch();
