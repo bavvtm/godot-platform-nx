@@ -44,7 +44,7 @@ Error NroBuilder::_convert_icon_to_jpeg(const String &p_src_icon_path, const Str
 
 Error NroBuilder::_prepare_staging_romfs(const String &p_src_romfs_dir, const String &p_staging_romfs_dir, const String &p_fused_pck_path) {
 	DirAccess::make_dir_recursive_absolute(p_staging_romfs_dir);
-	
+
 	String target_pck = p_staging_romfs_dir.path_join("game.pck");
 	DirAccess::remove_absolute(target_pck);
 
@@ -139,9 +139,9 @@ Error NroBuilder::build(const NroBuildConfig &p_config) {
 }
 
 NroBuilder::NroBuilder() {
-  // Does nothing.
+	// Does nothing.
 }
 
 NroBuilder::~NroBuilder() {
-  // Does nothing.
+	// Does nothing.
 }

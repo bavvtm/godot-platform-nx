@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
 
 		const Result boost = appletSetCpuBoostMode(ApmCpuBoostMode_FastLoad);
 		printf("CPU-Boost (1785 MHz) at main start: %s\n",
-			R_SUCCEEDED(boost) ? "success" : "invalid");
+		    R_SUCCEEDED(boost) ? "success" : "invalid");
 
 		char **setup_argv = nullptr;
 		int setup_argc = nx::build_setup_args(argc, argv, &setup_argv);

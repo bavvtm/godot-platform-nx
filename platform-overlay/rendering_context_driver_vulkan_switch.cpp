@@ -17,7 +17,7 @@ RenderingContextDriver::SurfaceID RenderingContextDriverVulkanSwitch::surface_cr
 	ERR_FAIL_NULL_V(wpd->window, SurfaceID());
 
 	PFN_vkCreateViSurfaceNN func_vkCreateViSurfaceNN =
-			(PFN_vkCreateViSurfaceNN)vkGetInstanceProcAddr(instance_get(), "vkCreateViSurfaceNN");
+	    (PFN_vkCreateViSurfaceNN)vkGetInstanceProcAddr(instance_get(), "vkCreateViSurfaceNN");
 
 	if (!func_vkCreateViSurfaceNN) {
 		TRACE("Failed to get vkCreateViSurfaceNN function pointer.");
@@ -32,10 +32,10 @@ RenderingContextDriver::SurfaceID RenderingContextDriverVulkanSwitch::surface_cr
 
 	VkSurfaceKHR vk_surface = VK_NULL_HANDLE;
 	VkResult err = func_vkCreateViSurfaceNN(
-			instance_get(),
-			&create_info,
-			get_allocation_callbacks(VK_OBJECT_TYPE_SURFACE_KHR),
-			&vk_surface);
+	    instance_get(),
+	    &create_info,
+	    get_allocation_callbacks(VK_OBJECT_TYPE_SURFACE_KHR),
+	    &vk_surface);
 
 	if (err != VK_SUCCESS) {
 		TRACE("Failed to create Vulkan surface: %d", err);

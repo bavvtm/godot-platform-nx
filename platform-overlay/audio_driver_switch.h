@@ -13,11 +13,11 @@ class AudioDriverSwitch : public AudioDriver {
 	bool initialized = false;
 	bool pause = false;
 
-  Thread thread;
-  Mutex mutex;
+	Thread thread;
+	Mutex mutex;
 
-  enum {
-    SAMPLE_RATE = 48000,
+	enum {
+		SAMPLE_RATE = 48000,
 		BUFFER_FRAMES = 1024,
 		BUFFER_COUNT = 3,
 	};
@@ -35,7 +35,7 @@ class AudioDriverSwitch : public AudioDriver {
 	AudioOutBuffer audout_bufs[BUFFER_COUNT];
 #endif
 
-  Error _init_device();
+	Error _init_device();
 
 #ifdef AUDREN_ENABLED
 	static void _thread_func_audren(void *p_udata);
@@ -65,5 +65,5 @@ public:
 	void set_channel(int p_channel) { channels = p_channel; };
 
 	AudioDriverSwitch();
-  ~AudioDriverSwitch();
+	~AudioDriverSwitch();
 };

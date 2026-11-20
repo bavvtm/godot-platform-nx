@@ -53,7 +53,7 @@ public:
 	virtual void alert(const String &p_alert, const String &p_title = "ALERT!") override;
 
 	String get_app_data_dir() const;
-	
+
 	void run();
 
 	OS_Switch();

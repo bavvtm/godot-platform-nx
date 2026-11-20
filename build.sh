@@ -157,6 +157,9 @@ function make_zip() {
 mkdir -p "${BUILD_DIR}"
 
 case "${1:-all}" in
+  format)
+    find "${GODOT_OVERLAY_DIR}" "${EXPORTER_SRC_DIR}/src" -type f \( -name "*.cpp" -o -name "*.h" \) -exec clang-format -i {} +
+    ;;
   mesa)
     clone_mesa || exit 1
     build_mesa || exit 1

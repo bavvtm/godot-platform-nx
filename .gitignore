@@ -22,3 +22,6 @@ template_debug
 log.txt
 gl_selftest
 __pycache__/
+.vscode/*
+!.vscode/tasks.json
+!.vscode/extensions.json

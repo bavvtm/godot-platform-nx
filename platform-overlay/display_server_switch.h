@@ -69,16 +69,16 @@ private:
 #endif
 
 	static DisplayServer *create_func(
-			const String &p_rendering_driver,
-			DisplayServerEnums::WindowMode p_mode,
-			DisplayServerEnums::VSyncMode p_vsync_mode,
-			uint32_t p_flags,
-			const Vector2i *p_position,
-			const Vector2i &p_resolution,
-			int p_screen,
-			DisplayServerEnums::Context p_context,
-			int64_t p_parent_window,
-			Error &r_error);
+	    const String &p_rendering_driver,
+	    DisplayServerEnums::WindowMode p_mode,
+	    DisplayServerEnums::VSyncMode p_vsync_mode,
+	    uint32_t p_flags,
+	    const Vector2i *p_position,
+	    const Vector2i &p_resolution,
+	    int p_screen,
+	    DisplayServerEnums::Context p_context,
+	    int64_t p_parent_window,
+	    Error &r_error);
 
 	static Vector<String> get_rendering_drivers_func();
 
@@ -194,7 +194,7 @@ public:
 
 	void dispatch_window_event(DisplayServerEnums::WindowEvent p_event);
 	void send_input_event(const Ref<InputEvent> &p_event) const;
- 
+
 	DisplayServerSwitch(const String &p_rendering_driver, DisplayServerEnums::VSyncMode p_vsync_mode, Error &r_error);
 	~DisplayServerSwitch();
 };

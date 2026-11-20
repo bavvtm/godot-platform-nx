@@ -12,16 +12,16 @@ class JoypadSwitch {
 private:
 	static inline HashMap<HidNpadButton, JoyButton> button_map;
 
-  bool connected[JOYPADS_MAX] = {};
+	bool connected[JOYPADS_MAX] = {};
 	u64 prev_buttons[JOYPADS_MAX] = {};
 	PadState pads[JOYPADS_MAX];
 
-  Input *input = nullptr;
+	Input *input = nullptr;
 
-  void _init_pad();
+	void _init_pad();
 
 public:
-  Error initialize();
+	Error initialize();
 	void process_pad();
 	void reset_pad_state();
 

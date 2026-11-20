@@ -22,7 +22,7 @@ void OS_Switch::initialize_joypads() {
 	if (joypad_switch) {
 		return;
 	}
-	
+
 	joypad_switch = memnew(JoypadSwitch());
 	if (joypad_switch->initialize() != OK) {
 		ERR_PRINT("Couldn't initialize Switch joypad input driver.");
@@ -158,10 +158,10 @@ void OS_Switch::run() {
 			last_in_focus = in_focus;
 
 			audio_driver.set_pause(!in_focus);
-			
+
 			if (DisplayServerSwitch::get_singleton()) {
 				DisplayServerSwitch::get_singleton()->dispatch_window_event(
-						in_focus ? DisplayServerEnums::WINDOW_EVENT_FOCUS_IN : DisplayServerEnums::WINDOW_EVENT_FOCUS_OUT);
+				    in_focus ? DisplayServerEnums::WINDOW_EVENT_FOCUS_IN : DisplayServerEnums::WINDOW_EVENT_FOCUS_OUT);
 			}
 		}
 
@@ -194,7 +194,7 @@ void OS_Switch::finalize() {
 		memdelete(joypad_switch);
 		joypad_switch = nullptr;
 	}
-	
+
 	if (main_loop) {
 		memdelete(main_loop);
 	}

@@ -72,7 +72,7 @@ void DisplayServerSwitch::dispatch_window_event(DisplayServerEnums::WindowEvent 
 	} else if (p_event == DisplayServerEnums::WINDOW_EVENT_FOCUS_OUT) {
 		main_window.is_focused = false;
 	}
-	
+
 	if (main_window.window_event_callback.is_valid()) {
 		Variant ev = p_event;
 		main_window.window_event_callback.call(ev);
@@ -208,17 +208,23 @@ void DisplayServerSwitch::virtual_keyboard_hide() {
 }
 
 DisplayServer *DisplayServerSwitch::create_func(
-		const String &p_rendering_driver,
-		DisplayServerEnums::WindowMode p_mode,
-		DisplayServerEnums::VSyncMode p_vsync_mode,
-		uint32_t p_flags,
-		const Vector2i *p_position,
-		const Vector2i &p_resolution,
-		int p_screen,
-		DisplayServerEnums::Context p_context,
-		int64_t p_parent_window,
-		Error &r_error) {
-	(void)p_mode; (void)p_flags; (void)p_position; (void)p_resolution; (void)p_screen; (void)p_context; (void)p_parent_window;
+    const String &p_rendering_driver,
+    DisplayServerEnums::WindowMode p_mode,
+    DisplayServerEnums::VSyncMode p_vsync_mode,
+    uint32_t p_flags,
+    const Vector2i *p_position,
+    const Vector2i &p_resolution,
+    int p_screen,
+    DisplayServerEnums::Context p_context,
+    int64_t p_parent_window,
+    Error &r_error) {
+	(void)p_mode;
+	(void)p_flags;
+	(void)p_position;
+	(void)p_resolution;
+	(void)p_screen;
+	(void)p_context;
+	(void)p_parent_window;
 	return memnew(DisplayServerSwitch(p_rendering_driver, p_vsync_mode, r_error));
 }
 

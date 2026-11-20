@@ -148,7 +148,7 @@ void AudioDriverSwitch::_thread_func_audren(void *p_udata) {
 		int free_buffer = -1;
 		for (int i = 0; i < BUFFER_COUNT; i++) {
 			if (ad->wavebufs[i].state == AudioDriverWaveBufState_Free ||
-					ad->wavebufs[i].state == AudioDriverWaveBufState_Done) {
+			    ad->wavebufs[i].state == AudioDriverWaveBufState_Done) {
 				free_buffer = i;
 				break;
 			}
@@ -237,7 +237,7 @@ Error AudioDriverSwitch::init() {
 	exit_thread = false;
 	pause = false;
 
-  Error err = _init_device();
+	Error err = _init_device();
 	if (err == OK) {
 #ifdef AUDREN_ENABLED
 		thread.start(AudioDriverSwitch::_thread_func_audren, this);
@@ -246,7 +246,7 @@ Error AudioDriverSwitch::init() {
 #endif
 	}
 
-  return err;
+	return err;
 }
 
 void AudioDriverSwitch::finish() {
@@ -280,7 +280,7 @@ void AudioDriverSwitch::finish() {
 }
 
 AudioDriverSwitch::AudioDriverSwitch() {
-  // Does nothing.
+	// Does nothing.
 }
 
 AudioDriverSwitch::~AudioDriverSwitch() {

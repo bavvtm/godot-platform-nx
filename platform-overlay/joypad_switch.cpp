@@ -12,8 +12,8 @@ static constexpr u64 pad_ids[JOYPADS_MAX] = {
 };
 
 void JoypadSwitch::_init_pad() {
-  // Switch Joypad to Godot JoyButton map
-  button_map[HidNpadButton_B] = JoyButton::A;
+	// Switch Joypad to Godot JoyButton map
+	button_map[HidNpadButton_B] = JoyButton::A;
 	button_map[HidNpadButton_A] = JoyButton::B;
 	button_map[HidNpadButton_Y] = JoyButton::X;
 	button_map[HidNpadButton_X] = JoyButton::Y;
@@ -30,7 +30,7 @@ void JoypadSwitch::_init_pad() {
 }
 
 Error JoypadSwitch::initialize() {
-  input = Input::get_singleton();
+	input = Input::get_singleton();
 	ERR_FAIL_NULL_V(input, ERR_UNCONFIGURED);
 
 	if (button_map.is_empty()) {
@@ -48,7 +48,7 @@ Error JoypadSwitch::initialize() {
 }
 
 void JoypadSwitch::process_pad() {
-  if (!input) {
+	if (!input) {
 		return;
 	}
 
@@ -140,7 +140,7 @@ void JoypadSwitch::reset_pad_state() {
 }
 
 JoypadSwitch::JoypadSwitch() {
-  // Does nothing.
+	// Does nothing.
 }
 
 JoypadSwitch::~JoypadSwitch() {

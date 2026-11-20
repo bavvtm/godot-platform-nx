@@ -11,7 +11,7 @@ static constexpr const char *PLATFORM_NAME = "Nintendo Switch";
 static constexpr const char *PLATFORM_OS_NAME = "Switch";
 static constexpr const char *BINARY_EXT = "nro";
 
-// dirs 
+// dirs
 static constexpr const char *ADDON_ROOT_DIR = "res://addons/switch_exporter";
 static constexpr const char *ROMFS_PATH = "res://addons/switch_exporter/romfs";
 static constexpr const char *BIN_DIR = "res://addons/switch_exporter/bin";
@@ -26,7 +26,7 @@ static inline String find_dkp_tool(const String &p_tool_name) {
 	String os_sub = is_win ? "windows" : "linux";
 
 	String bundled = ProjectSettings::get_singleton()->globalize_path(
-			String(BIN_DIR).path_join(os_sub).path_join(p_tool_name + exe_ext));
+	    String(BIN_DIR).path_join(os_sub).path_join(p_tool_name + exe_ext));
 	if (FileAccess::file_exists(bundled)) {
 		return bundled;
 	}

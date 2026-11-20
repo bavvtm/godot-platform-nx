@@ -23,12 +23,12 @@ namespace nx {
 constexpr u32 MAX_TOUCH_POINTS = 16;
 
 enum HardwareModel : u32 {
-	HARDWARE_ICOSA  = 0, // V1 (Erista)
+	HARDWARE_ICOSA = 0,  // V1 (Erista)
 	HARDWARE_COPPER = 1, // Erista DevKit
-	HARDWARE_HOAG   = 2, // Switch Lite
-	HARDWARE_IOWA   = 3, // V2 (Mariko)
+	HARDWARE_HOAG = 2,   // Switch Lite
+	HARDWARE_IOWA = 3,   // V2 (Mariko)
 	HARDWARE_CALCIO = 4, // Mariko DevKit
-	HARDWARE_AULA   = 5, // Switch OLED
+	HARDWARE_AULA = 5,   // Switch OLED
 };
 
 bool firmware_version(char *r_buf, size_t p_len);

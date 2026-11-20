@@ -39,7 +39,7 @@ static int _log_write_cb(void *, const char *p_buf, size_t p_len) {
 		}
 		fflush(s_log_file);
 	}
-	
+
 	return (int)p_len;
 }
 
@@ -269,4 +269,3 @@ bool is_lite_model() {
 }
 
 } // namespace nx
-
