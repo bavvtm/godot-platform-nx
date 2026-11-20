@@ -101,6 +101,10 @@ int main(int argc, char *argv[]) {
 		OS_Switch os;
 		os.set_executable_path(argv[0]);
 
+		const Result boost = appletSetCpuBoostMode(ApmCpuBoostMode_FastLoad);
+		printf("CPU-Boost (1785 MHz) at main start: %s\n",
+			R_SUCCEEDED(boost) ? "success" : "invalid");
+
 		char **setup_argv = nullptr;
 		int setup_argc = nx::build_setup_args(argc, argv, &setup_argv);
 
@@ -112,12 +116,9 @@ int main(int argc, char *argv[]) {
 #endif
 
 		if (err != OK) {
+			appletSetCpuBoostMode(ApmCpuBoostMode_Normal);
 			exit_code = (err == ERR_HELP) ? EXIT_SUCCESS : EXIT_FAILURE;
 		} else {
-			const Result boost = appletSetCpuBoostMode(ApmCpuBoostMode_FastLoad);
-			printf("CPU-Boost (1785 MHz) at main start: %s\n",
-				R_SUCCEEDED(boost) ? "success" : "invalid");
-
 			int start_ret = Main::start();
 			appletSetCpuBoostMode(ApmCpuBoostMode_Normal);
 
