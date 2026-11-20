@@ -155,15 +155,15 @@ void AudioDriverSwitch::_thread_func_audren(void *p_udata) {
 		}
 
 		if (free_buffer >= 0) {
-			ad->lock();
-			ad->start_counting_ticks();
-			ad->audio_server_process(BUFFER_FRAMES, ad->mixdown_buffer);
-			ad->stop_counting_ticks();
-			ad->unlock();
-
 			if (!ad->active || ad->pause) {
 				memset(ad->buffers[free_buffer], 0, single_buf_bytes);
 			} else {
+				ad->lock();
+				ad->start_counting_ticks();
+				ad->audio_server_process(BUFFER_FRAMES, ad->mixdown_buffer);
+				ad->stop_counting_ticks();
+				ad->unlock();
+
 				for (int s = 0; s < total_samples; s++) {
 					ad->buffers[free_buffer][s] = static_cast<int16_t>(ad->mixdown_buffer[s] >> 16);
 				}
@@ -211,16 +211,16 @@ void AudioDriverSwitch::_thread_func_audout(void *p_udata) {
 			continue;
 		}
 
-		ad->lock();
-		ad->start_counting_ticks();
-		ad->audio_server_process(BUFFER_FRAMES, ad->mixdown_buffer);
-		ad->stop_counting_ticks();
-		ad->unlock();
-
 		int16_t *dst = static_cast<int16_t *>(released_buf->buffer);
 		if (!ad->active || ad->pause) {
 			memset(dst, 0, single_buf_bytes);
 		} else {
+			ad->lock();
+			ad->start_counting_ticks();
+			ad->audio_server_process(BUFFER_FRAMES, ad->mixdown_buffer);
+			ad->stop_counting_ticks();
+			ad->unlock();
+
 			for (int s = 0; s < total_samples; s++) {
 				dst[s] = static_cast<int16_t>(ad->mixdown_buffer[s] >> 16);
 			}
