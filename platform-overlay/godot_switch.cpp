@@ -101,22 +101,8 @@ int main(int argc, char *argv[]) {
 		OS_Switch os;
 		os.set_executable_path(argv[0]);
 
-		char **file_argv = nullptr;
-		int file_argc = nx::load_args_from_file((argc > 0 && argv) ? argv[0] : nullptr, &file_argv);
-
-		int cli_argc = (argc > 1) ? (argc - 1) : 0;
-		int setup_argc = cli_argc + file_argc;
 		char **setup_argv = nullptr;
-
-		if (setup_argc > 0) {
-			setup_argv = (char **)malloc(sizeof(char *) * setup_argc);
-			for (int i = 0; i < cli_argc; i++) {
-				setup_argv[i] = argv[i + 1];
-			}
-			for (int i = 0; i < file_argc; i++) {
-				setup_argv[cli_argc + i] = file_argv[i];
-			}
-		}
+		int setup_argc = nx::build_setup_args(argc, argv, &setup_argv);
 
 		Error err = Main::setup(argv[0], setup_argc, setup_argv);
 
@@ -146,6 +132,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
+		free(setup_argv);
 		Main::cleanup();
 	}
 

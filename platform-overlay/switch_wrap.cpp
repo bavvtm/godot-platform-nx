@@ -9,6 +9,16 @@
 
 namespace nx {
 
+static bool _has_arg(char *const *p_args, int p_count, const char *p_target) {
+	for (int i = 0; i < p_count; i++) {
+		if (p_args[i] && strcmp(p_args[i], p_target) == 0) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 FILE *s_log_file = nullptr;
 
 static int _log_write_cb(void *, const char *p_buf, size_t p_len) {
@@ -139,6 +149,71 @@ int load_args_from_file(const char *p_argv0, char ***r_out_argv) {
 
 	*r_out_argv = list;
 	return count;
+}
+
+static bool _has_external_pck(const char *p_argv0) {
+	if (!p_argv0 || p_argv0[0] == '\0') {
+		return false;
+	}
+
+	char app_dir[512];
+	get_app_dir_from_argv(p_argv0, app_dir, sizeof(app_dir));
+
+	const char *base_name = strrchr(p_argv0, '/');
+	base_name = base_name ? (base_name + 1) : p_argv0;
+
+	char pck_path[544];
+	snprintf(pck_path, sizeof(pck_path), "%s/%s", app_dir, base_name);
+
+	char *last_dot = strrchr(pck_path, '.');
+	char *last_slash = strrchr(pck_path, '/');
+	if (last_dot && (!last_slash || last_dot > last_slash)) {
+		snprintf(last_dot, sizeof(pck_path) - (last_dot - pck_path), ".pck");
+	} else {
+		strncat(pck_path, ".pck", sizeof(pck_path) - strlen(pck_path) - 1);
+	}
+
+	return access(pck_path, F_OK) == 0;
+}
+
+int build_setup_args(int argc, char *argv[], char ***r_out_argv) {
+	if (!r_out_argv) {
+		return 0;
+	}
+
+	const char *arg0 = (argc > 0 && argv) ? argv[0] : nullptr;
+	int cli_argc = (argc > 1) ? (argc - 1) : 0;
+	char **cli_argv = (cli_argc > 0) ? (argv + 1) : nullptr;
+
+	char **file_argv = nullptr;
+	int file_argc = load_args_from_file(arg0, &file_argv);
+
+	bool has_custom_pack = _has_arg(cli_argv, cli_argc, "--main-pack") || _has_arg(file_argv, file_argc, "--main-pack");
+	bool use_fused_pck = (!has_custom_pack && !_has_external_pck(arg0) && access("romfs:/game.pck", F_OK) == 0);
+
+	int total = cli_argc + file_argc + (use_fused_pck ? 2 : 0);
+	if (total == 0) {
+		*r_out_argv = nullptr;
+		return 0;
+	}
+
+	char **out = (char **)malloc(sizeof(char *) * total);
+	int idx = 0;
+
+	for (int i = 0; i < cli_argc; i++) {
+		out[idx++] = cli_argv[i];
+	}
+	for (int i = 0; i < file_argc; i++) {
+		out[idx++] = file_argv[i];
+	}
+	if (use_fused_pck) {
+		out[idx++] = strdup("--main-pack");
+		out[idx++] = strdup("romfs:/game.pck");
+	}
+
+	free(file_argv);
+	*r_out_argv = out;
+	return total;
 }
 
 u32 hardware_type() {
