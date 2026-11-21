@@ -65,16 +65,18 @@ def get_flags():
     "opengl3": True,
     "alsa": False,
     "audren": True,
-		"pulseaudio": False,
-    "builtin_pcre2_with_jit": False,
+    "pulseaudio": False,
     "module_raycast_enabled": False,
     "module_jolt_physics_enabled": False, # disabled for now
     "module_lightmapper_rd_enabled": False,
     "module_openxr_enabled": False,
     "module_webxr_enabled": False,
-		"module_mobile_vr_enabled": False,
-		"module_camera_enabled": False,
-		"module_mono_enabled": False,
+    "module_mobile_vr_enabled": False,
+    "module_camera_enabled": False,
+    "module_mono_enabled": False,
+    "builtin_pcre2_with_jit": False,
+    "builtin_zlib": False,
+    "builtin_zstd": False,
   }
   
 def configure(env: "SConsEnvironment"):
@@ -173,4 +175,5 @@ def configure(env: "SConsEnvironment"):
     ]
   )
   
+  # non build in
   env.Append(LIBS=["expat", "zstd", "z", "nx", "m"])

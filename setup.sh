@@ -47,13 +47,6 @@ sudo dkp-pacman -Syu --noconfirm \
   switch-dev \
   switch-pkg-config \
   switch-zlib \
-  switch-freetype \
-  switch-bzip2 \
-  switch-mbedtls \
-  switch-libpng \
-  switch-libwebp \
-  switch-libogg \
-  switch-libvorbis \
   switch-libzstd \
   switch-libexpat
 
