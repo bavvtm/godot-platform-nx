@@ -120,8 +120,11 @@ String OS_Switch::get_user_data_dir() const {
 }
 
 Error OS_Switch::get_entropy(uint8_t *r_buffer, int p_bytes) {
-	if (p_bytes > 0 && r_buffer) {
-		randomGet(r_buffer, (size_t)p_bytes);
+	if (p_bytes <= 0) {
+		return OK;
+	}
+	if (R_FAILED(csrngGetRandomBytes(r_buffer, p_bytes))) {
+		return FAILED;
 	}
 	return OK;
 }

@@ -15,6 +15,7 @@
 #define FB_HEIGHT 720
 
 int main(int argc, char *argv[]) {
+	csrngInitialize();
 	socketInitializeDefault();
 	if (nxlinkStdio() < 0) {
 		const char *arg0 = (argc > 0 && argv) ? *argv : nullptr;
@@ -85,6 +86,7 @@ int main(int argc, char *argv[]) {
 		framebufferClose(&fb);
 		romfsExit();
 		socketExit();
+		csrngExit();
 		return 0;
 	}
 
@@ -139,5 +141,6 @@ int main(int argc, char *argv[]) {
 
 	romfsExit();
 	socketExit();
+	csrngExit();
 	return exit_code;
 }
