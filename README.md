@@ -16,8 +16,9 @@ Only core features are implemented and tested so far:
 - ✅ **Audio (`audren`)** — Background music and sound effects play properly.
 - ✅ **Joypad / Controller (`hid`)** — Joy-Con and Pro Controller inputs work natively.
 - ✅ **Touchscreen** — Handheld touch input is supported.
+- ✅ **Networking & TLS (`mbedtls` + `csrng`)** — Hardware entropy (`csrng`), `Crypto`, HTTPS requests (`HTTPRequest`), and DTLS over UDP are tested and working.
 - 🧪 **Virtual Keyboard (`swkbd`)** — Implemented in codebase, but **untested** yet.
-- 🧪 **Built-in Third-Party Modules (`mbedtls`, networking, etc.)** — Included in the build, but not all tested yet.
+- 🧪 **Other Built-in Third-Party Modules** — Included in the build, though not all modules have been individually tested yet.
 
 ## Known Quirks & Limitations
 
@@ -30,8 +31,10 @@ Only core features are implemented and tested so far:
 
 - **Godot Version:** Requires **Godot 4.7.2-stable** (standard build)—macos is not supported.
 - **Install:** Extract `switch_exporter-*.zip` in your project root and reload the project.
-- **Export:** Go to **Project > Export > Add... > Nintendo Switch** and export your `.nro` (generates `.nro` + `.pck`).
-- **Run on Switch:** Copy both `.nro` and `.pck` to the same folder on your SD card (e.g. `sdmc:/switch/your_game/`).
+- **Export:** Go to **Project > Export > Add... > Nintendo Switch** and choose your packaging mode:
+  - **Separate Build:** Generates `.nro` + `.pck` (copy both to `sdmc:/switch/your_game/`).
+  - **Fused Build:** Bundles `game.pck` directly inside `romfs:/`, producing a single self-contained `.nro` file.
+- **Custom Launch Flags (Optional):** Place an `args.txt` file in the game folder on your SD card (or inside `romfs:/`) to pass extra CLI arguments.
 
 ## Credits & Acknowledgements
 
